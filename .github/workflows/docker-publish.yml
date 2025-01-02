@@ -21,21 +21,7 @@ permissions:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
-          - linux/arm/v7
-        include:
-          - platform: linux/amd64
-            tag: amd64
-          - platform: linux/arm64
-            tag: arm64
-          - platform: linux/arm/v7
-            tag: arm-v7
     runs-on: ubuntu-latest
-    name: Build ${{ matrix.platform }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,38 +39,10 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
-          tags: fouteox/castor:${{ matrix.tag }}
+          tags: fouteox/castor:latest
 
-  create-manifest:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Create and push manifest
-        run: |
-          export DOCKER_CLI_EXPERIMENTAL=enabled
-
-          docker manifest create fouteox/castor:latest \
-            --amend fouteox/castor:amd64 \
-            --amend fouteox/castor:arm64 \
-            --amend fouteox/castor:arm-v7
-
-          docker manifest annotate fouteox/castor:latest \
-            fouteox/castor:amd64 --os linux --arch amd64
-          docker manifest annotate fouteox/castor:latest \
-            fouteox/castor:arm64 --os linux --arch arm64
-          docker manifest annotate fouteox/castor:latest \
-            fouteox/castor:arm-v7 --os linux --arch arm --variant v7
-
-          docker manifest push fouteox/castor:latest
-
-      - name: Inspect manifest
+      - name: Inspect image
         run: |
           docker buildx imagetools inspect fouteox/castor:latest
