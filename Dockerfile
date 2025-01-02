@@ -6,6 +6,11 @@ RUN apk add --no-cache \
 
 ARG TARGETPLATFORM
 
+RUN echo '#!/bin/sh\n\
+  trap "exit 0" INT TERM\n\
+  exec castor "$@"' > /usr/local/bin/docker-entrypoint.sh && \
+  chmod +x /usr/local/bin/docker-entrypoint.sh
+
 RUN case "${TARGETPLATFORM}" in \
   "linux/amd64") CASTOR_ARCH="linux-amd64" ;; \
   "linux/arm64") CASTOR_ARCH="linux-arm64" ;; \
@@ -17,4 +22,4 @@ RUN case "${TARGETPLATFORM}" in \
 
 WORKDIR /app
 
-ENTRYPOINT ["castor"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
