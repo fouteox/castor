@@ -27,6 +27,13 @@ jobs:
           - linux/amd64
           - linux/arm64
           - linux/arm/v7
+        include:
+          - platform: linux/amd64
+            tag: amd64
+          - platform: linux/arm64
+            tag: arm64
+          - platform: linux/arm/v7
+            tag: arm-v7
     runs-on: ubuntu-latest
     name: Build ${{ matrix.platform }}
     steps:
@@ -48,7 +55,7 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           push: true
-          tags: fouteox/castor:${{ matrix.platform }}
+          tags: fouteox/castor:${{ matrix.tag }}
 
   create-manifest:
     needs: build
@@ -63,9 +70,9 @@ jobs:
       - name: Create and push manifest
         run: |
           docker manifest create fouteox/castor:latest \
-            fouteox/castor:linux/amd64 \
-            fouteox/castor:linux/arm64 \
-            fouteox/castor:linux/arm/v7
+            fouteox/castor:amd64 \
+            fouteox/castor:arm64 \
+            fouteox/castor:arm-v7
 
           docker manifest push fouteox/castor:latest
 
