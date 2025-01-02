@@ -6,9 +6,7 @@ RUN apk add --no-cache \
 
 ARG TARGETPLATFORM
 
-RUN echo '#!/bin/sh\n\
-  trap "exit 0" INT TERM\n\
-  exec castor "$@"' > /usr/local/bin/docker-entrypoint.sh && \
+RUN printf '#!/bin/sh\ntrap "exit 0" INT TERM\nexec castor "$@"' > /usr/local/bin/docker-entrypoint.sh && \
   chmod +x /usr/local/bin/docker-entrypoint.sh
 
 RUN case "${TARGETPLATFORM}" in \
