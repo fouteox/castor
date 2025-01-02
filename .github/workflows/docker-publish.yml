@@ -69,10 +69,19 @@ jobs:
 
       - name: Create and push manifest
         run: |
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+
           docker manifest create fouteox/castor:latest \
-            fouteox/castor:amd64 \
-            fouteox/castor:arm64 \
-            fouteox/castor:arm-v7
+            --amend fouteox/castor:amd64 \
+            --amend fouteox/castor:arm64 \
+            --amend fouteox/castor:arm-v7
+
+          docker manifest annotate fouteox/castor:latest \
+            fouteox/castor:amd64 --os linux --arch amd64
+          docker manifest annotate fouteox/castor:latest \
+            fouteox/castor:arm64 --os linux --arch arm64
+          docker manifest annotate fouteox/castor:latest \
+            fouteox/castor:arm-v7 --os linux --arch arm --variant v7
 
           docker manifest push fouteox/castor:latest
 
