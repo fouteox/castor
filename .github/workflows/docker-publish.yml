@@ -28,11 +28,9 @@ jobs:
 
       - uses: docker/build-push-action@v5
         with:
-          context: .
-          file: Dockerfile.${{ matrix.alpine-version }}
+          context: ${{ matrix.alpine-version }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             fouteox/castor:alpine-${{ matrix.alpine-version }}
             ${{ matrix.alpine-version == '3.21' && 'fouteox/castor:latest' || '' }}
-
